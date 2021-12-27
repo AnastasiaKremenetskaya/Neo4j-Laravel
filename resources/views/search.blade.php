@@ -15,14 +15,14 @@ Release year:<input type="text" name="released" size="10" maxlength="9" value=@i
     </tr>
     @foreach($movies as $movie)
     <tr>
-      <td><a href="/neo4j/detail?movie_id={{$movie['id']}}">{{$movie["id"]}}</a></td>
-      <td><a href="/neo4j/recommend?movie_id={{$movie['id']}}">{{$movie["title"]}}</a></td>
+      <td><a href="/detail?movie_id={{$movie['id']}}">{{$movie["id"]}}</a></td>
+      <td><a href="/recommend?movie_id={{$movie['id']}}">{{$movie["title"]}}</a></td>
       <td>{{$movie["released"]}}</td>
     </tr>
     @endforeach
   </table>
 </div>
 @endif
-<input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
+<input type="hidden" name="_token" value="{{ csrf_token() }}">
 </form>
 @endsection

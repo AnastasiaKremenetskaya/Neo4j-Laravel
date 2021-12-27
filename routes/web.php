@@ -13,18 +13,32 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view("search");
-});
+//Route::resource('/movies', 'MovieController', [
+//    'names' => [
+//        'index' => 'movies.index',
+//        'show' => 'movies.show',
+//    ],
+//    'parameters' => [
+//        'movies' => 'title'
+//    ]
+//]);
+
+Route::get("/", "MovieController@index");
+Route::get("movies/{title}", "MovieController@show")->name('movies.show');
+Route::get("people/{name}", "MovieController@show")->name('people.show');
+Route::get("/search", "MovieController@search")->name('search');
+
+//Route::get('/search', function () {
+//    return view("search");
+//});
 
 
 //Route::match(["get", "post"], "/neo4j", function(){
 //    return view("neo4j.search");
 //});
-Route::post("/search", "Neo4j\Neo4jController@search");
 
-Route::get("/recommend", "Neo4j\Neo4jController@recommend");
-Route::post("/recommend", "Neo4j\Neo4jController@recommend");
+Route::get("/recommend", "MovieController@recommend");
+Route::post("/recommend", "MovieController@recommend");
 
-Route::get("/detail", "Neo4j\Neo4jController@detail");
-Route::post("/rating", "Neo4j\Neo4jController@rating");
+Route::get("/detail", "MovieController@detail");
+Route::post("/rating", "MovieController@rating");

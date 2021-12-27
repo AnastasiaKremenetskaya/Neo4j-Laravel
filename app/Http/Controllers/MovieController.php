@@ -8,21 +8,44 @@ use Illuminate\Http\Request;
 
 class MovieController extends Controller
 {
+    /**
+     * @var Movie
+     */
+    private $movie;
+
+    public function __construct()
+    {
+        $this->movie = new Movie();
+    }
+
+    public function index()
+    {
+        $data = $this->movie->all();
+
+        return view("movies.list", ["movies" => $data]);
+    }
+
+    public function show(Request $request)
+    {
+        $data = $this->movie->findMoviesWithRelationsByTitle($request['title']);
+
+        return view("people.list", ["people" => $data, 'movie' => $request['title']]);
+    }
 
     public function search(Request $request)
     {
-        $data = [];
-        $released = null;
+        $query = $request['search'];
 
-        if ($request->has("released")) {
-            $released = $request->input("released");
-            $model = new Movie();
-            $data = $model->findNodesByReleased($released);
+        if (empty($query)) {
+            return $this->index();
         }
 
-        return view("search")
-            ->with("movies", $data)
-            ->with("formReleased", $released);
+        $data = $this->movie->searchByMovieOrPerson($query);
+
+        return view("movies.search_result", [
+            "movies" => $data,
+            "query" => $query
+        ]);
     }
 
     public function recommend(Request $request)
@@ -39,17 +62,6 @@ class MovieController extends Controller
 
         return view("recommend")
             ->with("recommends", $recommend);
-    }
-
-    public function detail(Request $request)
-    {
-        $nodeProp = null;
-        if ($request->has("movie_id")) {
-            $movieId = $request->input("movie_id");
-            $model = new Movie();
-            $nodeProp = $model->findPropertiesById($movieId);
-        }
-        return view("detail")->with("nodeProp", $nodeProp);
     }
 
     public function rating(Request $request)
