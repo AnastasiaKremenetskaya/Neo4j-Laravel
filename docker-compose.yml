@@ -5,10 +5,8 @@ services:
     ports:
       - "7474:7474"
       - "7687:7687"
-    ulimits:
-      nofile:
-        soft: 40000
-        hard: 40000
+    environment:
+      - NEO4J_AUTH=none
   php:
     build:
       context: ./

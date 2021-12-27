@@ -2,16 +2,16 @@
 @section("content")
 
 <form name="form" action="/neo4j/search" method="post">
-リリース年:<input type="text" name="released" size="10" maxlength="9" value=@if(isset($formReleased)) "{{$formReleased}}" @endif>
-<input type="submit" value="SEARCH.">
+Release year:<input type="text" name="released" size="10" maxlength="9" value=@if(isset($formReleased)) "{{$formReleased}}" @endif>
+<input type="submit" value="SEARCH">
 
 @if(isset($movies) && count($movies) > 0)
 <div>
   <table>
     <tr>
       <th>ID</th>
-      <th>タイトル</th>
-      <th>リリース年</th>
+      <th>Title</th>
+      <th>Release year</th>
     </tr>
     @foreach($movies as $movie)
     <tr>

@@ -11,7 +11,6 @@ class Movie{
 
   public function __construct(){
     $this->client = new Client("neo4j", 7474);
-    $this->client->getTransport()->setAuth("neo4j", "****");
   }
 
   public function findNodesByReleased($released){
@@ -31,11 +30,11 @@ class Movie{
 
   public function findRecommendMovie($movieNodeId){
     $id = is_int($movieNodeId) ? $movieNodeId : (int)$movieNodeId;
-    $cypherStatement = 
+    $cypherStatement =
       "MATCH (m:Movie)<-[:ACTED_IN]-(p:Person)-[:ACTED_IN]->(n:Movie) "
       . " WHERE ID(m) = toInt({id}) AND ID(n) <> toInt({id}) "
       . " RETURN ID(n) as id, p.name AS name, n.title AS title ORDER BY name ";
-    
+
     $cypherQuery = new Query($this->client, $cypherStatement, ["id"=>$id]);
     $resultSet = $cypherQuery->getResultSet();
 

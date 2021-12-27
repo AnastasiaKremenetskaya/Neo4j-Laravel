@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view("neo4j.search");
 });
 
 Route::match(["get", "post"], "/neo4j", function(){

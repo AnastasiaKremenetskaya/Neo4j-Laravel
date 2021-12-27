@@ -90,7 +90,13 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
         ],
-
+        'neo4j' => [
+            'driver' => 'neo4j',
+            'host'   => 'localhost',
+            'port'   => '7474',
+            'username' => env('DB_USERNAME', ''),
+            'password' => env('DB_PASSWORD', ''),
+        ],
     ],
 
     /*
