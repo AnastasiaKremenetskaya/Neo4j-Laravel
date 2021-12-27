@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 use Everyman\Neo4j\Client,
     Everyman\Neo4j\Index\NodeIndex,
@@ -7,26 +6,6 @@ use Everyman\Neo4j\Client,
     Everyman\Neo4j\Cypher;
 use Illuminate\Database\Seeder;
 
-//require_once 'example_bootstrap.php';
-//
-//$cmd = !empty($argv[1]) ? $argv[1] : null;
-//
-//if (!$cmd) {
-//    echo <<<HELP
-//Usage:
-//{$argv[0]}
-//	Display usage instructions
-//
-//{$argv[0]} init
-//	Initialize the data.  This only needs to be done once.
-//
-//{$argv[0]} actors <movie_name>
-//	Get a list of all actors in the movie.
-//
-//
-//HELP;
-//    exit(0);
-//}
 class MoviesActorsSeeder extends Seeder
 {
     /**
@@ -39,11 +18,8 @@ class MoviesActorsSeeder extends Seeder
     {
 
         $client = new Client("neo4j", 7474);
-        $client->getTransport()->setAuth("neo4j", "1234567q");
         $actors = new NodeIndex($client, 'actors');
-//
-//// Initialize the data
-//if ($cmd == 'init') {
+
         $keanu = $client->makeNode()->setProperty('name', 'Keanu Reeves')->save();
         $laurence = $client->makeNode()->setProperty('name', 'Laurence Fishburne')->save();
         $jennifer = $client->makeNode()->setProperty('name', 'Jennifer Connelly')->save();
@@ -54,18 +30,18 @@ class MoviesActorsSeeder extends Seeder
         $actors->add($jennifer, 'name', $jennifer->getProperty('name'));
         $actors->add($kevin, 'name', $kevin->getProperty('name'));
 
-        $matrix = $client->makeNode()->setProperty('title', 'The Matrix')->save();
-        $higherLearning = $client->makeNode()->setProperty('title', 'Higher Learning')->save();
-        $mysticRiver = $client->makeNode()->setProperty('title', 'Mystic River')->save();
+        $matrix = $client->makeNode()->setProperties(['title' => 'The Matrix', 'released' => '2003'])->save();
+        $higherLearning = $client->makeNode()->setProperties(['title' => 'Higher Learning', 'released' => '2010'])->save();
+        $mysticRiver = $client->makeNode()->setProperties(['title' => 'Mystic River', 'released' => '2003'])->save();
 
-        $keanu->relateTo($matrix, 'IN')->save();
-        $laurence->relateTo($matrix, 'IN')->save();
+        $keanu->relateTo($matrix, 'ACTED_IN')->save();
+        $laurence->relateTo($matrix, 'ACTED_IN')->save();
 
-        $laurence->relateTo($higherLearning, 'IN')->save();
-        $jennifer->relateTo($higherLearning, 'IN')->save();
+        $laurence->relateTo($higherLearning, 'ACTED_IN')->save();
+        $jennifer->relateTo($higherLearning, 'ACTED_IN')->save();
 
-        $laurence->relateTo($mysticRiver, 'IN')->save();
-        $kevin->relateTo($mysticRiver, 'IN')->save();
+        $laurence->relateTo($mysticRiver, 'ACTED_IN')->save();
+        $kevin->relateTo($mysticRiver, 'ACTED_IN')->save();
 
 //// Find all actors in a movie
 //} else if ($cmd == 'actors') {

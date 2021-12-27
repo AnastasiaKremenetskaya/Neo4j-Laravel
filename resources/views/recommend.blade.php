@@ -1,4 +1,4 @@
-@extends("neo4j.template")
+@extends("template")
 
 @section("content")
 @if(isset($recommends) && count($recommends) > 0)
@@ -11,7 +11,7 @@
 @foreach($recommends as $recommend)
 <tr>
   <td>{{$recommend["name"]}}</td>
-  <td><a href="/neo4j/recommend?movie_id={{$recommend['id']}}">{{$recommend["title"]}}</a></td>
+  <td><a href="/recommend?movie_id={{$recommend['id']}}">{{$recommend["title"]}}</a></td>
 </tr>
 @endforeach
 </table>

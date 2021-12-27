@@ -1,4 +1,4 @@
-@extends("neo4j.template")
+@extends("template")
 @section("content")
 
 <form name="form" action="/neo4j/search" method="post">

@@ -14,13 +14,17 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view("neo4j.search");
+    return view("search");
 });
 
-Route::match(["get", "post"], "/neo4j", function(){
-    return view("neo4j.search");
-});
-Route::match(["get", "post"], "/neo4j/search", "Neo4j\Neo4jController@search");
-Route::match(["get", "post"], "/neo4j/recommend", "Neo4j\Neo4jController@recommend");
-Route::get("/neo4j/detail", "Neo4j\Neo4jController@detail");
-Route::post("/neo4j/rating", "Neo4j\Neo4jController@rating");
+
+//Route::match(["get", "post"], "/neo4j", function(){
+//    return view("neo4j.search");
+//});
+Route::post("/search", "Neo4j\Neo4jController@search");
+
+Route::get("/recommend", "Neo4j\Neo4jController@recommend");
+Route::post("/recommend", "Neo4j\Neo4jController@recommend");
+
+Route::get("/detail", "Neo4j\Neo4jController@detail");
+Route::post("/rating", "Neo4j\Neo4jController@rating");

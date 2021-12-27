@@ -23,10 +23,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $client = new \Everyman\Neo4j\Client("neo4j");
-        //$client->getTransport()->setAuth("neo4j", "neo4j");
 
-// Test connection to server
-        dd($client->getServerInfo());
     }
 }
