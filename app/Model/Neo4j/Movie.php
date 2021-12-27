@@ -4,6 +4,7 @@ namespace App\Model\Neo4j;
 
 use Everyman\Neo4j\Client;
 use Everyman\Neo4j\Cypher\Query;
+use Illuminate\Support\Str;
 
 class Movie
 {
@@ -25,7 +26,7 @@ class Movie
         foreach ($resultSet as $result) {
             $recommend[] = [
                 "title" => $result->current()->title,
-                "tagline" => $result->current()->tagline,
+                "tagline" => $result->current()->tagline ?? '',
                 "released" => $result->current()->released,
             ];
         }
@@ -35,9 +36,9 @@ class Movie
     public function findMoviesWithRelationsByTitle($title): array
     {
         $cypherStatement =
-            "MATCH (m:Movie)<-[:ACTED_IN]-(p:Person)-[:ACTED_IN]->(movie:Movie)"
+            "MATCH (m:Movie)<-[r]-(p:Person)-[r2]->(movie:Movie)"
             ." WHERE m.title = {title}"
-            . " RETURN p, movie ORDER BY p.name ";
+            . " RETURN type(r), p, type(r2), movie ORDER BY type(r), p.name ";
 
         $cypherQuery = new Query($this->client, $cypherStatement, ["title" => $title]);
         $resultSet = $cypherQuery->getResultSet();
@@ -45,24 +46,34 @@ class Movie
         $recommend = [];
 
         foreach ($resultSet as $result) {
-            $actor = $result[0]->getProperties()['name'];
-            if (!array_key_exists($actor, $recommend)) {
-                $recommend[$actor] = [
-                    'born' => $result[0]->getProperties()['born'],
-                ];
-            }
-            $movie = [
-                'title' => $result[1]->getProperties()['title'],
-                'tagline' => $result[1]->getProperties()['tagline'] ?? '',
-                'released' => $result[1]->getProperties()['released'],
-            ];
+            $relation = match($result->current()) {
+                'ACTED_IN' => 'Acted',
+                'DIRECTED' => 'Directed',
+                'null' => 'Found movies',
+                default => Str::ucfirst(strtolower($result->current())),
+            };
+            $actor = $result[1]->getProperties()['name'];
 
-            $recommend[$result[0]->getProperties()['name']]['movies'][] = $movie;
+            $recommend[$relation][$actor]['born'] = $result[1]->getProperties()['born'];
+
+            $relation2 = match($result[2]) {
+                'ACTED_IN' => 'Acted',
+                'DIRECTED' => 'Directed',
+                'null' => 'Found movies',
+                default => Str::ucfirst(strtolower($result[2])),
+            };
+
+            $recommend[$relation][$actor]['movies'][$relation2][] = [
+                "title" => $result[3]->getProperties()['title'],
+                "tagline" => $result[3]->getProperties()['tagline'] ?? '',
+                "released" => $result[3]->getProperties()['released'],
+            ];
         }
+
         return $recommend;
     }
 
-    public function searchByMovieOrPerson($query)
+    public function searchMovieByTitleOrRelatedPersonName($query): array
     {
         $cypherStatement =
             "MATCH (p:Person)-[r]->(m:Movie)"
@@ -88,7 +99,7 @@ class Movie
             };
             $recommend[$relation][] = [
                 "title" => $result->current()->title,
-                "tagline" => $result->current()->tagline,
+                "tagline" => $result->current()->tagline ?? '',
                 "released" => $result->current()->released,
             ];
         }

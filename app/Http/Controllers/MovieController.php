@@ -40,7 +40,7 @@ class MovieController extends Controller
             return $this->index();
         }
 
-        $data = $this->movie->searchByMovieOrPerson($query);
+        $data = $this->movie->searchMovieByTitleOrRelatedPersonName($query);
 
         return view("movies.search_result", [
             "movies" => $data,
