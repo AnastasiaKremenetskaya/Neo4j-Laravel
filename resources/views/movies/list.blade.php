@@ -11,6 +11,7 @@
                                 <th>Title</th>
                                 <th>Tagline</th>
                                 <th>Released</th>
+                                <th></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -24,6 +25,13 @@
                                     </td>
                                     <td>
                                         {{ $movie['released'] }}
+                                    </td>
+                                    <td>
+                                        <form action="{{ route('movies.delete', $movie['title']) }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        </form>
                                     </td>
                             @endforeach
 

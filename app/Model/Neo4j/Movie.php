@@ -159,6 +159,20 @@ class Movie
         return $cypherQuery->getResultSet()[0]->current();
     }
 
+    public function deleteMovie($data)
+    {
+        $transaction = $this->client->beginTransaction();
+        $cypherStatement =
+            "MATCH (m:Movie {title: {title})"
+            . " DELETE m";
+
+        $cypherQuery = new Query($this->client, $cypherStatement, [
+            "title" => $data['title'],
+        ]);
+        $transaction->addStatements($cypherQuery);
+        $transaction->commit();
+    }
+
 
 
 

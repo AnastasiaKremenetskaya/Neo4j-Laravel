@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get("/", "MovieController@index");
 Route::get("movies/{title}", "MovieController@show")->name('movies.show');
+Route::delete("movies/{title}", "MovieController@deleteMovie")->name('movies.delete');
 
 Route::get("people/{name}", "MovieController@showPerson")->name('people.show');
 Route::get("people/{name}/edit", "MovieController@editPerson")->name('people.edit');

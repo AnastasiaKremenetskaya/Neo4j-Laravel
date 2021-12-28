@@ -68,11 +68,20 @@ class MovieController extends Controller
         $data = $this->movie->findPerson($query);
 
         if (!empty($data))
-        return view("people.edit", [
-            "person" => $data,
-        ]); else {
+            return view("people.edit", [
+                "person" => $data,
+            ]); else {
             return redirect('/');
         }
+    }
+
+    public function deleteMovie(Request $request)
+    {
+        $query = $request['title'];
+
+        $this->movie->deleteMovie($query);
+
+        return redirect('/');
     }
 
     public function updatePerson(Request $request)
@@ -85,8 +94,6 @@ class MovieController extends Controller
             "person" => $data,
         ]);
     }
-
-
 
 
     public function recommend(Request $request)
