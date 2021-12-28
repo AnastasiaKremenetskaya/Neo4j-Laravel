@@ -19,6 +19,9 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('report4') }}">Report 4</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('report5') }}">Report 5</a>
+                </li>
             </ul>
         </div>
 

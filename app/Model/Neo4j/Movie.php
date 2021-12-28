@@ -226,34 +226,12 @@ class Movie
             }
         }
 
-//        $labels = $this->client->getLabels();
-//
-//        $movie = $this->client->makeNode()
-//            ->setProperty('title', $data['title'])
-//            ->setProperty('released', $data['released'])
-//            ->setProperty('tagline', $data['tagline'])
-//            ->save();
-//
-////        $movie = $this->client->makeNode()->setProperties([
-////            'title' => $data['title'],
-////            'released' => $data['released'],
-////            'tagline' => $data['tagline'],
-////        ])->save();
-//        //Set relations
-//        foreach ($data['relations'] as $relation => $people) {
-//            foreach ($people as $person) {
-//                $match = $this->client->getNode((int)$person);
-//                $match->relateTo($movie, $relation)->save()->addLabels([$labels[1]]);
-////                $movie = $this->client->makeNode()->setProperties(['title' => $data['title']])->save();
-//            }
-//        }
-//        $movie->addLabels([$labels[0]]);
         return $newMovie ?? $data['title'];
     }
 
 
     //1. Выбрать всех продюсеров, которые написали сценарий хотя бы для одного своего фильма.
-// При этом в фильме должно быть минимум три актера
+    // При этом в фильме должно быть минимум три актера
     public function report1()
     {
         $cypherStatement = "MATCH (p:Person)-[r:WROTE]->(m:Movie)<-[r2:ACTED_IN]-(:Person)"
@@ -307,6 +285,38 @@ class Movie
             $recommend[] = $result[0]->getProperties();
         }
         return $recommend;
+    }
+
+    //4. Выбрать фильм с наименьшим рейтингом
+    public function report4()
+    {
+        $cypherStatement = "MATCH (u:Person)-[r:REVIEWED]->(m:Movie)"
+            . " RETURN m, r.rating ORDER BY r.rating ASC LIMIT 1";
+
+        $cypherQuery = new Query($this->client, $cypherStatement);
+        $resultSet = $cypherQuery->getResultSet();
+        $recommend = [];
+        foreach ($resultSet as $result) {
+            $recommend[] = $result[0]->getProperties();
+            $res = $result[1];
+        }
+        return [$recommend, $res];
+    }
+
+    //5. Выбрать фильм с наибольшим рейтингом
+    public function report5()
+    {
+        $cypherStatement = "MATCH (u:Person)-[r:REVIEWED]->(m:Movie)"
+            . " RETURN m, r.rating ORDER BY r.rating DESC LIMIT 1";
+
+        $cypherQuery = new Query($this->client, $cypherStatement);
+        $resultSet = $cypherQuery->getResultSet();
+        $recommend = [];
+        foreach ($resultSet as $result) {
+            $recommend[] = $result[0]->getProperties();
+            $res = $result[1];
+        }
+        return [$recommend, $res];
     }
 
 

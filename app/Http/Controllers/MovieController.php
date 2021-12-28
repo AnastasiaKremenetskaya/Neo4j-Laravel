@@ -145,6 +145,28 @@ class MovieController extends Controller
         ]);
     }
 
+    //4. Выбрать фильм с самым низким рейтингом из существующих
+    public function report4()
+    {
+        $data = $this->movie->report4();
+
+        return view("reports.5", [
+            "movies" => $data[0],
+            "rating" => $data[1],
+        ]);
+    }
+
+    //4. Выбрать фильм с самым низким рейтингом из существующих
+    public function report5()
+    {
+        $data = $this->movie->report5();
+
+        return view("reports.4", [
+            "movies" => $data[0],
+            "rating" => $data[1],
+        ]);
+    }
+
     public function recommend(Request $request)
     {
 
