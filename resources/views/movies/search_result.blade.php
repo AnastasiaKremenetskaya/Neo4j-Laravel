@@ -1,6 +1,11 @@
 @extends("template")
 @section("content")
-    <h2><small class="text-muted">Results for</small> "{{ $query }}"</h2>
+    <div class="d-flex justify-content-between">
+        <h2><small class="text-muted">Results for</small> "{{ $query }}"</h2>
+        @if(!empty($showEditPersonButton))
+            <button class="btn btn-outline-primary flex-end justify-content-end"><a class="text-decoration-none" href="{{ route('people.edit', $query) }}">Edit person</a></button>
+        @endif
+    </div>
     <div class="row">
         <div class="col-xs-12">
             <div class="panel">

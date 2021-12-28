@@ -36,9 +36,9 @@ class Movie
     public function findMoviesWithRelationsByTitle($title): array
     {
         $cypherStatement =
-            "MATCH (m:Movie)<-[r]-(p:Person)-[r2]->(movie:Movie)"
-            ." WHERE m.title = {title}"
-            . " RETURN type(r), p, type(r2), movie ORDER BY type(r), p.name ";
+            "MATCH (m:Movie {title: {title}})<-[r]-(p:Person)"
+            . " OPTIONAL MATCH (p)-[r2]->(movie:Movie)"
+            . " RETURN type(r), p, type(r2), movie ORDER BY type(r), p.name";
 
         $cypherQuery = new Query($this->client, $cypherStatement, ["title" => $title]);
         $resultSet = $cypherQuery->getResultSet();
@@ -46,7 +46,7 @@ class Movie
         $recommend = [];
 
         foreach ($resultSet as $result) {
-            $relation = match($result->current()) {
+            $relation = match ($result->current()) {
                 'ACTED_IN' => 'Acted',
                 'DIRECTED' => 'Directed',
                 'null' => 'Found movies',
@@ -56,7 +56,7 @@ class Movie
 
             $recommend[$relation][$actor]['born'] = $result[1]->getProperties()['born'];
 
-            $relation2 = match($result[2]) {
+            $relation2 = match ($result[2]) {
                 'ACTED_IN' => 'Acted',
                 'DIRECTED' => 'Directed',
                 'null' => 'Found movies',
@@ -91,7 +91,7 @@ class Movie
         $recommend = [];
 
         foreach ($resultSet as $result) {
-            $relation = match($result[1]) {
+            $relation = match ($result[1]) {
                 'ACTED_IN' => 'Acted in',
                 'DIRECTED' => 'Directed',
                 'null' => 'Found movies',
@@ -105,6 +105,61 @@ class Movie
         }
         return $recommend;
     }
+
+    public function findPerson($name): array
+    {
+        $cypherStatement =
+            "MATCH (p:Person {name: {name}})-[r]->(m:Movie)"
+            . " RETURN ID(p), p, type(r), m ORDER BY type(r), p.name";
+
+        $cypherQuery = new Query($this->client, $cypherStatement, ["name" => $name]);
+        $resultSet = $cypherQuery->getResultSet();
+
+        $recommend = [];
+
+        foreach ($resultSet as $result) {
+            $recommend["id"] = $result[0];
+            $recommend["born"] = $result[1]->getProperties()['born'];
+            $recommend["name"] = $result[1]->getProperties()['name'];
+
+            $relation2 = match ($result[2]) {
+                'ACTED_IN' => 'Acted',
+                'DIRECTED' => 'Directed',
+                'null' => 'Found movies',
+                default => Str::ucfirst(strtolower($result[2])),
+            };
+
+            $recommend['movies'][$relation2][] = [
+                "title" => $result[3]->getProperties()['title'],
+                "tagline" => $result[3]->getProperties()['tagline'] ?? '',
+                "released" => $result[3]->getProperties()['released'],
+            ];
+        }
+
+        return $recommend;
+    }
+
+    public function updatePerson($data): string
+    {
+        $transaction = $this->client->beginTransaction();
+        $cypherStatement =
+            "MATCH (p:Person)"
+            . " WHERE ID(p) = toInt({id})"
+            . " SET p.born = toInt({born})"
+            . " SET p.name = {name} RETURN p.name";
+
+        $cypherQuery = new Query($this->client, $cypherStatement, [
+            "name" => $data['name'],
+            'born' => $data['born'],
+            'id' => $data['id'],
+        ]);
+        $transaction->addStatements($cypherQuery);
+        $transaction->commit();
+
+        return $cypherQuery->getResultSet()[0]->current();
+    }
+
+
 
 
     public function findNodesByReleased($released)

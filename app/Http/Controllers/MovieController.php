@@ -48,6 +48,47 @@ class MovieController extends Controller
         ]);
     }
 
+    public function showPerson(Request $request)
+    {
+        $query = $request['name'];
+
+        $data = $this->movie->searchMovieByTitleOrRelatedPersonName($query);
+
+        return view("movies.search_result", [
+            "movies" => $data,
+            "query" => $query,
+            "showEditPersonButton" => true
+        ]);
+    }
+
+    public function editPerson(Request $request)
+    {
+        $query = $request['name'];
+
+        $data = $this->movie->findPerson($query);
+
+        if (!empty($data))
+        return view("people.edit", [
+            "person" => $data,
+        ]); else {
+            return redirect('/');
+        }
+    }
+
+    public function updatePerson(Request $request)
+    {
+        $name = $this->movie->updatePerson($request);
+
+        $data = $this->movie->findPerson($name);
+
+        return view("people.edit", [
+            "person" => $data,
+        ]);
+    }
+
+
+
+
     public function recommend(Request $request)
     {
 

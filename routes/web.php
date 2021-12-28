@@ -25,7 +25,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::get("/", "MovieController@index");
 Route::get("movies/{title}", "MovieController@show")->name('movies.show');
-Route::get("people/{name}", "MovieController@show")->name('people.show');
+
+Route::get("people/{name}", "MovieController@showPerson")->name('people.show');
+Route::get("people/{name}/edit", "MovieController@editPerson")->name('people.edit');
+Route::put("people/{id}/update", "MovieController@updatePerson")->name('people.update');
+
 Route::get("/search", "MovieController@search")->name('search');
 
 //Route::get('/search', function () {
