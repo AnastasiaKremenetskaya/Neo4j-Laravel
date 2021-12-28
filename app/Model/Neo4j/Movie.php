@@ -216,8 +216,8 @@ class Movie
             foreach ($people as $person) {
                 $cypherStatement =
                     "MATCH (m:Movie {title: {title}}), (p:Person)"
-                    ." WHERE ID(p) = toInt({name})"
-                    ." CREATE (p)-[r:".$relation."]->(m)";
+                    . " WHERE ID(p) = toInt({name})"
+                    . " CREATE (p)-[r:" . $relation . "]->(m)";
 
                 (new Query($this->client, $cypherStatement, [
                     "title" => $newMovie,
@@ -249,6 +249,64 @@ class Movie
 //        }
 //        $movie->addLabels([$labels[0]]);
         return $newMovie ?? $data['title'];
+    }
+
+
+    //1. Выбрать всех продюсеров, которые написали сценарий хотя бы для одного своего фильма.
+// При этом в фильме должно быть минимум три актера
+    public function report1()
+    {
+        $cypherStatement = "MATCH (p:Person)-[r:WROTE]->(m:Movie)<-[r2:ACTED_IN]-(:Person)"
+            . " WITH p,m, count(r2) as countr2"
+            . " WHERE countr2 > 3 RETURN p, m";
+
+        $cypherQuery = new Query($this->client, $cypherStatement);
+        $resultSet = $cypherQuery->getResultSet();
+        $recommend = [];
+        foreach ($resultSet as $result) {
+            $recommend[$result[0]->getProperties()['name']]['born'] = $result[0]->getProperties()['born'];
+            $recommend[$result[0]->getProperties()['name']]['movies'][] = [
+                "title" => $result[1]->getProperties()['title'],
+                "tagline" => $result[1]->getProperties()['tagline'] ?? '',
+                "released" => $result[1]->getProperties()['released'],
+            ];
+        }
+        return $recommend;
+    }
+
+    //2. Выбрать фильмы, которые рекомендуют люди, обозревшие Cloud Atlas. Отсортировать по количеству
+    public function report2()
+    {
+        $cypherStatement = "MATCH (m:Movie {title: 'Cloud Atlas'})<-[:REVIEWED]-(p:Person)-[:REVIEWED]->(rec:Movie)"
+            . " RETURN rec, COUNT(*) AS usersWhoAlsoWatched"
+            . " ORDER BY usersWhoAlsoWatched DESC LIMIT 25";
+
+        $cypherQuery = new Query($this->client, $cypherStatement);
+        $resultSet = $cypherQuery->getResultSet();
+        $recommend = [];
+        foreach ($resultSet as $result) {
+            $recommend[] = $result[0]->getProperties();
+        }
+        return $recommend;
+    }
+
+    //3. Выбрать фильмы, которые Джессика Томпсон оценила выше своих средних оценок
+    public function report3()
+    {
+        $cypherStatement = "MATCH (u:Person {name: 'Jessica Thompson'})"
+            . " MATCH (u)-[r:REVIEWED]->(m:Movie)"
+            . " WITH u, avg(r.rating) AS average"
+            . " MATCH (u)-[r:REVIEWED]->(m:Movie)"
+            . " WHERE r.rating > average"
+            . " RETURN m";
+
+        $cypherQuery = new Query($this->client, $cypherStatement);
+        $resultSet = $cypherQuery->getResultSet();
+        $recommend = [];
+        foreach ($resultSet as $result) {
+            $recommend[] = $result[0]->getProperties();
+        }
+        return $recommend;
     }
 
 

@@ -35,6 +35,11 @@ Route::put("people/{id}/update", "MovieController@updatePerson")->name('people.u
 
 Route::get("/search", "MovieController@search")->name('search');
 
+Route::get("/report1", "MovieController@report1")->name('report1');
+Route::get("/report2", "MovieController@report2")->name('report2');
+Route::get("/report3", "MovieController@report3")->name('report3');
+Route::get("/report4", "MovieController@report4")->name('report4');
+
 //Route::get('/search', function () {
 //    return view("search");
 //});
@@ -44,8 +49,8 @@ Route::get("/search", "MovieController@search")->name('search');
 //    return view("neo4j.search");
 //});
 
-Route::get("/recommend", "MovieController@recommend");
-Route::post("/recommend", "MovieController@recommend");
-
-Route::get("/detail", "MovieController@detail");
-Route::post("/rating", "MovieController@rating");
+//Route::get("/recommend", "MovieController@recommend");
+//Route::post("/recommend", "MovieController@recommend");
+//
+//Route::get("/detail", "MovieController@detail");
+//Route::post("/rating", "MovieController@rating");

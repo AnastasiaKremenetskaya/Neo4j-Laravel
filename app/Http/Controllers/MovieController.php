@@ -114,6 +114,36 @@ class MovieController extends Controller
         ]);
     }
 
+    //1. Выбрать всех продюсеров, которые написали сценарий хотя бы для одного фильма.
+    // При этом в фильме должно быть минимум три актера
+    public function report1()
+    {
+        $data = $this->movie->report1();
+
+        return view("reports.1", [
+            "people" => $data,
+        ]);
+    }
+
+    //2. Выбрать фильмы, которые рекомендуют люди, посмотревшие Cloud Atlas. Отсортировать по количеству
+    public function report2()
+    {
+        $data = $this->movie->report2();
+
+        return view("reports.2", [
+            "movies" => $data,
+        ]);
+    }
+
+    //3. Выбрать фильмы, которые Джессика Томпсон оценила выше своих средних оценок
+    public function report3()
+    {
+        $data = $this->movie->report3();
+
+        return view("reports.3", [
+            "movies" => $data,
+        ]);
+    }
 
     public function recommend(Request $request)
     {

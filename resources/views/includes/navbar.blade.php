@@ -8,7 +8,16 @@
                     <a class="nav-link" href="{{ route('movies.create') }}">Create movie</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                    <a class="nav-link" href="{{ route('report1') }}">Report 1</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('report2') }}">Report 2</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('report3') }}">Report 3</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('report4') }}">Report 4</a>
                 </li>
             </ul>
         </div>
