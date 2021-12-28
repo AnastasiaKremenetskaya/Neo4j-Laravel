@@ -33,6 +33,30 @@ class Movie
         return $recommend;
     }
 
+    public function allPeople()
+    {
+        $cypherStatement = "MATCH (p:Person) RETURN p.name ORDER BY p.name";
+        $cypherQuery = new Query($this->client, $cypherStatement);
+        $resultSet = $cypherQuery->getResultSet();
+        $recommend = [];
+        foreach ($resultSet as $result) {
+            $recommend[] = $result->current();
+        }
+        return $recommend;
+    }
+
+    public function allPeopleWithIds()
+    {
+        $cypherStatement = "MATCH (p:Person) RETURN p.name, ID(p) ORDER BY p.name";
+        $cypherQuery = new Query($this->client, $cypherStatement);
+        $resultSet = $cypherQuery->getResultSet();
+        $recommend = [];
+        foreach ($resultSet as $result) {
+            $recommend[$result[1]] = $result->current();
+        }
+        return $recommend;
+    }
+
     public function findMoviesWithRelationsByTitle($title): array
     {
         $cypherStatement =
@@ -54,7 +78,8 @@ class Movie
             };
             $actor = $result[1]->getProperties()['name'];
 
-            $recommend[$relation][$actor]['born'] = $result[1]->getProperties()['born'];
+//            dd($result[1]->getProperties());
+            $recommend[$relation][$actor]['born'] = $result[1]->getProperties()['born'] ?? '';
 
             $relation2 = match ($result[2]) {
                 'ACTED_IN' => 'Acted',
@@ -159,21 +184,72 @@ class Movie
         return $cypherQuery->getResultSet()[0]->current();
     }
 
-    public function deleteMovie($data)
+    public function deleteMovie($query)
     {
         $transaction = $this->client->beginTransaction();
         $cypherStatement =
-            "MATCH (m:Movie {title: {title})"
-            . " DELETE m";
+            "MATCH (m:Movie {title: {title}})"
+            . " DETACH DELETE m";
 
         $cypherQuery = new Query($this->client, $cypherStatement, [
-            "title" => $data['title'],
+            "title" => $query,
         ]);
         $transaction->addStatements($cypherQuery);
         $transaction->commit();
     }
 
+    public function storeMovie($data)
+    {
+        $cypherStatement =
+            "CREATE (m:Movie {title: {title}, released: {released}, tagline: {tagline}})"
+            . " RETURN m.title";
 
+        $cypherQuery = new Query($this->client, $cypherStatement, [
+            "title" => $data['title'],
+            "released" => $data['released'],
+            "tagline" => $data['tagline'],
+        ]);
+        $newMovie = $cypherQuery->getResultSet()[0]->current();
+
+        //Set relations
+        foreach ($data['relations'] as $relation => $people) {
+            foreach ($people as $person) {
+                $cypherStatement =
+                    "MATCH (m:Movie {title: {title}}), (p:Person)"
+                    ." WHERE ID(p) = toInt({name})"
+                    ." CREATE (p)-[r:".$relation."]->(m)";
+
+                (new Query($this->client, $cypherStatement, [
+                    "title" => $newMovie,
+                    "name" => $person,
+                ]))->getResultSet();
+            }
+        }
+
+//        $labels = $this->client->getLabels();
+//
+//        $movie = $this->client->makeNode()
+//            ->setProperty('title', $data['title'])
+//            ->setProperty('released', $data['released'])
+//            ->setProperty('tagline', $data['tagline'])
+//            ->save();
+//
+////        $movie = $this->client->makeNode()->setProperties([
+////            'title' => $data['title'],
+////            'released' => $data['released'],
+////            'tagline' => $data['tagline'],
+////        ])->save();
+//        //Set relations
+//        foreach ($data['relations'] as $relation => $people) {
+//            foreach ($people as $person) {
+//                $match = $this->client->getNode((int)$person);
+//                $match->relateTo($movie, $relation)->save()->addLabels([$labels[1]]);
+////                $movie = $this->client->makeNode()->setProperties(['title' => $data['title']])->save();
+//            }
+//        }
+//        $movie->addLabels([$labels[0]]);
+        return $newMovie ?? $data['title'];
+    }
 
 
     public function findNodesByReleased($released)

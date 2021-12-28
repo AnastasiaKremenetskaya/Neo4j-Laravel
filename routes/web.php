@@ -24,6 +24,8 @@ use Illuminate\Support\Facades\Route;
 //]);
 
 Route::get("/", "MovieController@index");
+Route::get("movies/create", "MovieController@createMovie")->name('movies.create');
+Route::post("movies/create", "MovieController@storeMovie")->name('movies.store');
 Route::get("movies/{title}", "MovieController@show")->name('movies.show');
 Route::delete("movies/{title}", "MovieController@deleteMovie")->name('movies.delete');
 

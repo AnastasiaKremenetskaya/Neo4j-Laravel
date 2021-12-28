@@ -95,6 +95,25 @@ class MovieController extends Controller
         ]);
     }
 
+    public function createMovie()
+    {
+        $people = $this->movie->allPeopleWithIds();
+
+        return view("movies.create", ['people' => $people]);
+    }
+
+    public function storeMovie(Request $request)
+    {
+        $newMovie = $this->movie->storeMovie($request->all());
+
+        $data = $this->movie->searchMovieByTitleOrRelatedPersonName($newMovie);
+
+        return view("movies.search_result", [
+            "movies" => $data,
+            "query" => $newMovie
+        ]);
+    }
+
 
     public function recommend(Request $request)
     {

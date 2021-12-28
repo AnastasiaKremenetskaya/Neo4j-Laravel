@@ -29,7 +29,7 @@
                                             <h5>
                                                 <mark>{{ $role }}</mark>
                                             </h5>
-                                            <table class="table mb-0">
+                                            <table class="table mb-3">
                                                 <thead>
                                                 <tr class="row">
                                                     <th class="col">Title</th>
