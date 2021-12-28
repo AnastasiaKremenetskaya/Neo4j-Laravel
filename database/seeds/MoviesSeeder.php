@@ -8,7 +8,7 @@ use Everyman\Neo4j\Client,
 use Everyman\Neo4j\Cypher\Query;
 use Illuminate\Database\Seeder;
 
-//require_once 'movies.geoff';
+//require_once 'movies.cypher';
 //
 //$cmd = !empty($argv[1]) ? $argv[1] : null;
 //
@@ -42,12 +42,12 @@ class MoviesSeeder extends Seeder
         $geoff = new Everyman\Neo4j\Geoff($client);
 
 // Import from a file
-        $handle = fopen('database/data/movies.geoff', 'r');
+        $handle = fopen('database/data/movies.cypher', 'r');
         $singleBatch = $geoff->load($handle);
         $singleBatch->commit();
 
 //        // Export to a string
-//        $geoffString = $geoff->dump('/database/data/movies.geoff');
+//        $geoffString = $geoff->dump('/database/data/movies.cypher');
 //        $client = new Client("neo4j", 7474);
 //        $transaction = $client->beginTransaction();
 //        try{
@@ -65,7 +65,7 @@ class MoviesSeeder extends Seeder
 ////
 ////// Initialize the data
 ////if ($cmd == 'init') {
-//        $keanu = $client->makeNode()->setProperty('name', 'Keanu Reeves')->save();
+        $keanu = $client->makeNode()->setProperty('name', 'Keanu Reeves')->save();
 //        $laurence = $client->makeNode()->setProperty('name', 'Laurence Fishburne')->save();
 //        $jennifer = $client->makeNode()->setProperty('name', 'Jennifer Connelly')->save();
 //        $kevin = $client->makeNode()->setProperty('name', 'Kevin Bacon')->save();
